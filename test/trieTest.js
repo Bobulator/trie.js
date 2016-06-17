@@ -378,4 +378,136 @@ describe("trie tests", function() {
             trie.getSize().should.equal(17576);
         });
     });
+
+    describe("deleteWord", function() {
+        var testWord;
+
+        beforeEach(function() {
+            testWord = "";
+        });
+
+        it("should fail when trie is empty", function() {
+            testWord = "test";
+            expect(trie.deleteWord(testWord)).to.be.false;
+            trie.getSize().should.equal(0);
+        });
+
+        it("should be able to delete the only word in a trie", function() {
+            testWord = "test";
+            trie.addWord(testWord);
+
+            expect(trie.deleteWord(testWord)).to.be.true;
+            trie.getSize().should.equal(0);
+        });
+
+        it("should be able to delete a word from a populated trie without affecting the other words", function() {
+            var testWords = ["t", "apple", "orange", "tes", "testing"];
+            testWord = "test";
+
+            var i;
+            for (i = 0; i < testWords.length; i++) {
+                trie.addWord(testWords[i]);
+            }
+            trie.addWord(testWord);
+
+            expect(trie.deleteWord(testWord)).to.be.true;
+            trie.getSize().should.equal(testWords.length);
+            for (i = 0; i < testWords.length; i++) {
+                expect(trie.contains(testWords[i])).to.be.true;
+            }
+        });
+
+        it("should be able to delete all the words from a trie", function() {
+            var testWords = ["t", "apple", "orange", "tes", "testing"];
+
+            var i;
+            for (i = 0; i < testWords.length; i++) {
+                trie.addWord(testWords[i]);
+            }
+
+            for (i = 0; i < testWords.length; i++) {
+                expect(trie.deleteWord(testWords[i])).to.be.true;
+                expect(trie.contains(testWords[i])).to.be.false;
+                trie.getSize().should.equal(testWords.length - i - 1);
+            }
+        });
+
+        it("should be able to re-add a word once it is deleted", function() {
+            testWord = "test";
+            trie.addWord(testWord);
+
+            expect(trie.deleteWord(testWord)).to.be.true;
+            expect(trie.contains(testWord)).to.be.false;
+            trie.getSize().should.equal(0);
+
+            expect(trie.addWord(testWord)).to.be.true;
+            expect(trie.contains(testWord)).to.be.true;
+            trie.getSize().should.equal(1);
+        });
+
+        it("should fail when the given word is not a string", function() {
+            testWord = "control";
+            trie.addWord(testWord);
+
+            testWord = 1;
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = { word: "word" };
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = null;
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = NaN;
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = undefined;
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = function notAWordFunction() {
+                return "notAWord";
+            }
+            expect(trie.deleteWord(testWord)).to.be.false;
+        });
+
+        it("should fail when the given word contains non-letter characters", function() {
+            testWord = "control";
+            trie.addWord(testWord);
+
+            testWord = "1";
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = "-";
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = "&";
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = "apple1";
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = "1apple";
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = "hello world";
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = "hello-world";
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = "hellow1world";
+            expect(trie.deleteWord(testWord)).to.be.false;
+
+            testWord = "hello_world";
+            expect(trie.deleteWord(testWord)).to.be.false;
+        });
+
+        it("should fail when the given word is the empty string", function() {
+            testWord = "control";
+            trie.addWord(testWord);
+
+            testWord = "";
+            expect(trie.deleteWord(testWord)).to.be.false;
+        });
+    });
 });
