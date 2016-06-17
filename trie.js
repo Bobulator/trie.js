@@ -50,10 +50,22 @@ var trie = function Trie(initialDictionary) {
     }
 
     function deleteWord(word) {
-        if (size === 0 || !isValid(word)) {
+        if (size === 0 || !isValid(word) || !contains(word)) {
             return false;
         } else {
             word = word.toLowerCase();
+
+            var currentNode = root;
+
+            var i;
+            for (i = 0; i < word.length; i++) {
+                currentNode = currentNode.children[word[i]];
+            }
+
+            currentNode.isWord = false;
+            
+            size -= 1;
+            return true;
         }
     }
 
